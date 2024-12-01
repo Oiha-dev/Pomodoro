@@ -1,5 +1,9 @@
+<script>
+    import Timer from "./Timer.svelte";
+</script>
+
 <svelte:head>
-    <title>Boilerplate</title>
+    <title>Pomodoro</title>
     <meta name="description" content="A very simple boirlerplate for sveltekit" />
 
     <!-- SEO -->
@@ -14,5 +18,4 @@
 </svelte:head>
 
 
-<h1>Welcome to my SvelteKit boilerplate</h1>
-<p>Visit <a href="https://portfolio-rodolphe-andrieux.vercel.app/">my portfolio</a></p>
+<Timer runningAtStart=true />
