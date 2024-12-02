@@ -21,8 +21,6 @@
         <Canvas/>
         <slot/>
     </main>
-
-    <Footer />
 </div>
 
 

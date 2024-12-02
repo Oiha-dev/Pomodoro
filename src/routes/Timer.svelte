@@ -1,9 +1,9 @@
 <script>
-    import { onMount } from "svelte";
+    import {onMount} from "svelte";
 
-    export let initialTime = 1500;
-    export let shortBreakTime = 300;
-    export let longBreakTime = 900;
+    export let initialTime = 30;
+    export let shortBreakTime = 5;
+    export let longBreakTime = 10;
     export let runningAtStart = false;
 
     let currentInitialTime = initialTime;
@@ -87,9 +87,47 @@
 
 <div class="timer">
     <h1>{formattedTime}</h1>
-    <button on:click={startTimer}>{isRunning && !pause ? 'Pause' : 'Start'}</button>
-    <button on:click={() => resetTimer(currentInitialTime)}>Reset</button>
-    <button on:click={() => resetTimer(initialTime)}>Pomodoro</button>
-    <button on:click={() => resetTimer(shortBreakTime)}>Short Break</button>
-    <button on:click={() => resetTimer(longBreakTime)}>Long Break</button>
+    <div class="startButtons">
+        <button on:click={startTimer}>{isRunning && !pause ? 'Pause' : 'Start'}</button>
+        <button on:click={() => resetTimer(currentInitialTime)}>Reset</button>
+    </div>
+    <div class="timeButtons">
+        <button on:click={() => resetTimer(initialTime)}>Pomodoro</button>
+        <button on:click={() => resetTimer(shortBreakTime)}>Short Break</button>
+        <button on:click={() => resetTimer(longBreakTime)}>Long Break</button>
+    </div>
 </div>
+
+<style>
+    .timer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 50vw;
+        height: 55vh;
+        margin: auto;
+        background-color: var(--color-theme-1);
+        color: white;
+        border-radius: 20px;
+        position: relative;
+    }
+
+    .timer h1 {
+        font-size: 7rem;
+    }
+
+    .startButtons {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .timeButtons {
+        display: flex;
+        justify-content: space-around;
+        position: absolute;
+        top: 50px;
+        width: 75%;
+        flood-color: var(--color-theme-2);
+    }
+</style>

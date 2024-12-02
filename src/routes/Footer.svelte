@@ -30,12 +30,4 @@
         margin-bottom: 10px;
         padding: 0 1rem;
     }
-
-    a {
-        transition: transform .3s;
-    }
-
-    a:hover {
-        transform: scale(1.2);
-    }
 </style>
