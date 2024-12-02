@@ -1,9 +1,9 @@
 <script>
-    import {onMount} from "svelte";
+    import { onMount } from "svelte";
 
-    export let initialTime = 30;
-    export let shortBreakTime = 5;
-    export let longBreakTime = 10;
+    export let initialTime = 25 * 60;
+    export let shortBreakTime = 5 * 60;
+    export let longBreakTime = 15 * 60;
     export let runningAtStart = false;
 
     let currentInitialTime = initialTime;
@@ -11,32 +11,40 @@
     let pause = false;
     let isRunning = false;
     let formattedTime = formatTime(runningTime);
-    let interval;
+    let startTime;
     let shortBreakCount = 0;
+    let audio;
 
     onMount(() => {
+        audio = new Audio('alarm.wav');
+
         if (runningAtStart) startTimer();
     });
 
     function startTimer() {
         if (isRunning && !pause) {
             pause = true;
-            clearInterval(interval);
         } else {
             isRunning = true;
             pause = false;
-            interval = setInterval(updateTimer, 1000);
+            startTime = Date.now();
+            updateTimer();
         }
     }
 
     function updateTimer() {
         if (pause) return;
-        runningTime--;
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        runningTime = currentInitialTime - elapsed;
         formattedTime = formatTime(runningTime);
-        if (runningTime < 0) {
-            clearInterval(interval);
+        if (runningTime <= 0) {
             isRunning = false;
+            if (audio) {
+                audio.play();
+            }
             handleTimerEnd();
+        } else {
+            setTimeout(updateTimer, 1000);
         }
     }
 
@@ -62,12 +70,12 @@
     }
 
     function resetTimer(time) {
-        clearInterval(interval);
         currentInitialTime = time;
         runningTime = time;
         formattedTime = formatTime(runningTime);
         if (isRunning && !pause) {
-            interval = setInterval(updateTimer, 1000);
+            startTime = Date.now();
+            updateTimer();
         } else {
             isRunning = false;
             pause = false;
@@ -128,6 +136,5 @@
         position: absolute;
         top: 50px;
         width: 75%;
-        flood-color: var(--color-theme-2);
     }
 </style>
