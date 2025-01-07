@@ -18,9 +18,14 @@
     let timerInterval;
 
     onMount(() => {
+        console.log(runningAtStart)
         audio = new Audio('alarm.wav');
 
-        if (runningAtStart) startTimer();
+        if (runningAtStart !== "false") {
+            isRunning = true;
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
     });
 
     function startTimer() {
@@ -100,8 +105,8 @@
 <div class="timer">
     <h1>{formattedTime}</h1>
     <div class="startButtons">
-        <button class="btn-secondary" on:click={startTimer}>{isRunning && !pause ? 'Pause' : 'Start'}</button>
-        <button class="btn-secondary" on:click={() => resetTimer(currentInitialTime)}>Reset</button>
+        <button class="start btn-secondary" on:click={startTimer}>{isRunning && !pause ? 'Pause' : 'Start'}</button>
+        <button class="reset btn-secondary" on:click={() => resetTimer(currentInitialTime)}>Reset</button>
     </div>
     <div class="timeButtons">
         <button on:click={() => resetTimer(initialTime)} class:btn-primary={isPomodoro} class:btn-secondary={!isPomodoro}>Pomodoro</button>
@@ -123,6 +128,7 @@
         color: white;
         border-radius: 20px;
         position: relative;
+        padding: 20px;
     }
 
     .timer h1 {
@@ -133,14 +139,21 @@
         gap: 1rem;
         display: flex;
         justify-content: space-around;
+        position: absolute;
+        top: 69%;
     }
 
     .timeButtons {
         display: flex;
         justify-content: space-around;
         position: absolute;
-        top: 50px;
+        top: 20%;
         width: 75%;
+        gap: 10px;
+    }
+
+    .timeButtons button {
+        width: 156px;
     }
 
     .btn-primary, .btn-secondary {
@@ -172,5 +185,82 @@
     .btn-secondary:hover {
         background-color: var(--bg-color-dark);
         color: white;
+    }
+
+    .start {
+        width: 96px;
+    }
+
+    /* Tablet styles */
+    @media (max-width: 768px) {
+        .timer {
+            width: 80vw;
+            height: 60vh;
+        }
+
+        .timer h1 {
+            position: absolute;
+            font-size: 8rem;
+            top: 0;
+        }
+
+        .timeButtons {
+            position: static;
+            flex-direction: row;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .timeButtons button {
+            width: 120px;
+            padding: 15px 10px;
+            font-size: 16px;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 15px 15px;
+            font-size: 18px;
+        }
+    }
+
+    /* Mobile styles */
+    @media (max-width: 480px) {
+        .timer {
+            width: 90vw;
+            height: auto;
+            min-height: 70vh;
+            padding: 30px 15px;
+        }
+
+        .timer h1 {
+            font-size: 3.5rem;
+        }
+
+        .timeButtons {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .timeButtons button {
+            width: 100%;
+            padding: 12px 10px;
+            font-size: 14px;
+        }
+
+        .startButtons {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .start, .reset {
+            width: 45%;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 12px;
+            font-size: 16px;
+        }
     }
 </style>
