@@ -18,4 +18,4 @@
 </svelte:head>
 
 
-<Timer runningAtStart=true />
+<Timer runningAtStart = false />
