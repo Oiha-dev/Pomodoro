@@ -1,9 +1,9 @@
 <script>
     import { onMount } from "svelte";
 
-    export let initialTime = 7 * 1;
-    export let shortBreakTime = 5 * 1;
-    export let longBreakTime = 6 * 1;
+    export let initialTime = 25 * 60;
+    export let shortBreakTime = 5 * 60;
+    export let longBreakTime = 15 * 60;
     export let runningAtStart = false;
 
     let currentInitialTime = initialTime;
