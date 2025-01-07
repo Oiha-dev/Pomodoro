@@ -1,11 +1,21 @@
-version: '3'
+#docker-compose.yml sans DB
 
-services:
-  boiler:
-    build: .
-    image: boiler
-    ports:
-        - "3000:3000"
-    volumes:
-        - ./:/usr/src/app
-        - /usr/src/app/node_modules
+  version: '3.9'
+
+  services:
+    Pomodoro:
+      build: .
+      container_name: Pomodoro
+      ports:
+        - "3008:3000"
+      networks:
+        - web
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.Pomodoro.rule=PathPrefix(`/Pomodoro`)"
+        - "traefik.http.services.Pomodoro.loadbalancer.server.port=3000"
+        - "traefik.http.routers.Pomodoro.entrypoints=web"
+
+  networks:
+    web:
+      external: true
