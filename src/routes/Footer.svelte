@@ -14,8 +14,8 @@
         display: flex;
         justify-content: flex-start;
         align-items: flex-start;
-        background-color: #2e2e2e;
-        color: var(--color-bg-0);
+        background-color: var(--color-bg-dark);
+        color: var(--font-color-dark);
     }
 
     #flex-div {

@@ -1,9 +1,9 @@
 <script>
     import { onMount } from "svelte";
 
-    export let initialTime = 25 * 60;
-    export let shortBreakTime = 5 * 60;
-    export let longBreakTime = 15 * 60;
+    export let initialTime = 7 * 1;
+    export let shortBreakTime = 5 * 1;
+    export let longBreakTime = 6 * 1;
     export let runningAtStart = false;
 
     let currentInitialTime = initialTime;
@@ -12,8 +12,10 @@
     let isRunning = false;
     let formattedTime = formatTime(runningTime);
     let startTime;
+    let elapsedPauseTime = 0;
     let shortBreakCount = 0;
     let audio;
+    let timerInterval;
 
     onMount(() => {
         audio = new Audio('alarm.wav');
@@ -24,11 +26,13 @@
     function startTimer() {
         if (isRunning && !pause) {
             pause = true;
+            elapsedPauseTime = Date.now() - startTime;
+            clearInterval(timerInterval);
         } else {
             isRunning = true;
             pause = false;
-            startTime = Date.now();
-            updateTimer();
+            startTime = Date.now() - elapsedPauseTime;
+            timerInterval = setInterval(updateTimer, 1000);
         }
     }
 
@@ -39,12 +43,11 @@
         formattedTime = formatTime(runningTime);
         if (runningTime <= 0) {
             isRunning = false;
+            clearInterval(timerInterval);
             if (audio) {
                 audio.play();
             }
             handleTimerEnd();
-        } else {
-            setTimeout(updateTimer, 1000);
         }
     }
 
@@ -73,22 +76,23 @@
         currentInitialTime = time;
         runningTime = time;
         formattedTime = formatTime(runningTime);
-        if (isRunning && !pause) {
-            startTime = Date.now();
-            updateTimer();
-        } else {
-            isRunning = false;
-            pause = false;
-        }
+        isRunning = false;
+        pause = false;
+        elapsedPauseTime = 0;
+        clearInterval(timerInterval);
     }
+
+    $: isPomodoro = currentInitialTime === initialTime;
+    $: isShortBreak = currentInitialTime === shortBreakTime;
+    $: isLongBreak = currentInitialTime === longBreakTime;
 </script>
 
 <svelte:head>
-    {#if currentInitialTime === initialTime}
+    {#if isPomodoro}
         <title>Pomodoro {formattedTime}</title>
-    {:else if currentInitialTime === shortBreakTime}
+    {:else if isShortBreak}
         <title>Short Break {formattedTime}</title>
-    {:else if currentInitialTime === longBreakTime}
+    {:else if isLongBreak}
         <title>Long Break {formattedTime}</title>
     {/if}
 </svelte:head>
@@ -96,13 +100,13 @@
 <div class="timer">
     <h1>{formattedTime}</h1>
     <div class="startButtons">
-        <button on:click={startTimer}>{isRunning && !pause ? 'Pause' : 'Start'}</button>
-        <button on:click={() => resetTimer(currentInitialTime)}>Reset</button>
+        <button class="btn-secondary" on:click={startTimer}>{isRunning && !pause ? 'Pause' : 'Start'}</button>
+        <button class="btn-secondary" on:click={() => resetTimer(currentInitialTime)}>Reset</button>
     </div>
     <div class="timeButtons">
-        <button on:click={() => resetTimer(initialTime)}>Pomodoro</button>
-        <button on:click={() => resetTimer(shortBreakTime)}>Short Break</button>
-        <button on:click={() => resetTimer(longBreakTime)}>Long Break</button>
+        <button on:click={() => resetTimer(initialTime)} class:btn-primary={isPomodoro} class:btn-secondary={!isPomodoro}>Pomodoro</button>
+        <button on:click={() => resetTimer(shortBreakTime)} class:btn-primary={isShortBreak} class:btn-secondary={!isShortBreak}>Short Break</button>
+        <button on:click={() => resetTimer(longBreakTime)} class:btn-primary={isLongBreak} class:btn-secondary={!isLongBreak}>Long Break</button>
     </div>
 </div>
 
@@ -115,7 +119,7 @@
         width: 50vw;
         height: 55vh;
         margin: auto;
-        background-color: var(--color-theme-1);
+        background-color: var(--first-color-dark);
         color: white;
         border-radius: 20px;
         position: relative;
@@ -126,6 +130,7 @@
     }
 
     .startButtons {
+        gap: 1rem;
         display: flex;
         justify-content: space-around;
     }
@@ -136,5 +141,36 @@
         position: absolute;
         top: 50px;
         width: 75%;
+    }
+
+    .btn-primary, .btn-secondary {
+        padding: 20px 20px;
+        border-radius: 19px;
+        font-size: 20px;
+        cursor: pointer;
+        text-align: center;
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: var(--third-color-dark);
+        color: var(--font2-color-dark);
+        border: 2px solid var(--third-color-dark);
+    }
+
+    .btn-primary:hover {
+        background-color: #7ec5af;
+        border: 2px solid #7ec5af;
+    }
+
+    .btn-secondary {
+        background-color: transparent;
+        color: var(--font-color-dark);
+        border: 2px solid var(--second-color-dark);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--bg-color-dark);
+        color: white;
     }
 </style>

@@ -20,6 +20,7 @@
     <main>
         <Canvas/>
         <slot/>
+        <Footer/>
     </main>
 </div>
 
