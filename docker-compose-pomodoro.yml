@@ -3,9 +3,9 @@
   version: '3.9'
 
   services:
-    Pomodoro:
+    pomodoro:
       build: .
-      container_name: Pomodoro
+      container_name: pomodoro
       ports:
         - "3008:3000"
       networks:
