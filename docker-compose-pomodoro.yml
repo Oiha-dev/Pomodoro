@@ -1,4 +1,4 @@
-#docker-compose.yml sans DB
+#docker-compose-pomodoro.yml sans DB
 
   version: '3.9'
 
