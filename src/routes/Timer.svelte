@@ -226,14 +226,14 @@
     /* Mobile styles */
     @media (max-width: 480px) {
         .timer {
-            width: 90vw;
+            width: 80vw;
             height: auto;
             min-height: 70vh;
-            padding: 30px 15px;
+            padding: 0px 15px;
         }
 
         .timer h1 {
-            font-size: 3.5rem;
+            font-size: 6rem;
         }
 
         .timeButtons {
