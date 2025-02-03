@@ -1,5 +1,6 @@
 <script>
-    import { onMount } from "svelte";
+    import { onMount, tick } from "svelte";
+    import OptionsMenu from "./OptionsMenu.svelte";
 
     export let initialTime = 25 * 60;
     export let shortBreakTime = 5 * 60;
@@ -16,15 +17,54 @@
     let shortBreakCount = 0;
     let audio;
     let timerInterval;
+    let showOptions = false;
+    let progress = 100;
+
+    function toggleOptions() {
+        showOptions = !showOptions;
+    }
+
+    function handleUpdateSettings(event) {
+        const { initialTime: newInitial, shortBreakTime: newShort, longBreakTime: newLong, runningAtStart: newRunning } = event.detail;
+        let previousMode = isPomodoro ? "pomodoro" : isShortBreak ? "shortBreak" : "longBreak";
+
+        initialTime = newInitial;
+        shortBreakTime = newShort;
+        longBreakTime = newLong;
+        runningAtStart = newRunning;
+
+        if (previousMode === "pomodoro") {
+            currentInitialTime = initialTime;
+            runningTime = initialTime;
+        } else if (previousMode === "shortBreak") {
+            currentInitialTime = shortBreakTime;
+            runningTime = shortBreakTime;
+        } else if (previousMode === "longBreak") {
+            currentInitialTime = longBreakTime;
+            runningTime = longBreakTime;
+        }
+
+        formattedTime = formatTime(runningTime);
+    }
 
     onMount(() => {
-        console.log(runningAtStart)
+        const savedSettings = JSON.parse(localStorage.getItem("pomodoroSettings"));
+        if (savedSettings) {
+            initialTime = savedSettings.initialTime;
+            shortBreakTime = savedSettings.shortBreakTime;
+            longBreakTime = savedSettings.longBreakTime;
+            runningAtStart = savedSettings.runningAtStart;
+            currentInitialTime = initialTime;
+            runningTime = initialTime;
+            formattedTime = formatTime(runningTime);
+        }
+
         audio = new Audio('alarm.wav');
 
-        if (runningAtStart !== "false") {
+        if (runningAtStart) {
             isRunning = true;
             startTime = Date.now();
-            timerInterval = setInterval(updateTimer, 1000);
+            timerInterval = setInterval(updateTimer, 10);
         }
     });
 
@@ -37,15 +77,18 @@
             isRunning = true;
             pause = false;
             startTime = Date.now() - elapsedPauseTime;
-            timerInterval = setInterval(updateTimer, 1000);
+            timerInterval = setInterval(updateTimer, 10);
         }
     }
 
-    function updateTimer() {
+    async function updateTimer() {
         if (pause) return;
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        runningTime = currentInitialTime - elapsed;
+        const elapsed = (Date.now() - startTime) / 1000;
+        runningTime = Math.floor(currentInitialTime - elapsed);
         formattedTime = formatTime(runningTime);
+
+        progress = 100 - ((currentInitialTime - elapsed) / currentInitialTime) * 100;
+
         if (runningTime <= 0) {
             isRunning = false;
             clearInterval(timerInterval);
@@ -54,6 +97,8 @@
             }
             handleTimerEnd();
         }
+
+        await tick();
     }
 
     function handleTimerEnd() {
@@ -102,20 +147,52 @@
     {/if}
 </svelte:head>
 
-<div class="timer">
-    <h1>{formattedTime}</h1>
-    <div class="startButtons">
-        <button class="start btn-secondary" on:click={startTimer}>{isRunning && !pause ? 'Pause' : 'Start'}</button>
-        <button class="reset btn-secondary" on:click={() => resetTimer(currentInitialTime)}>Reset</button>
-    </div>
-    <div class="timeButtons">
-        <button on:click={() => resetTimer(initialTime)} class:btn-primary={isPomodoro} class:btn-secondary={!isPomodoro}>Pomodoro</button>
-        <button on:click={() => resetTimer(shortBreakTime)} class:btn-primary={isShortBreak} class:btn-secondary={!isShortBreak}>Short Break</button>
-        <button on:click={() => resetTimer(longBreakTime)} class:btn-primary={isLongBreak} class:btn-secondary={!isLongBreak}>Long Break</button>
+
+<div
+        class="timer"
+        class:running={isRunning && !pause}
+        style="--progress: {progress}%;">
+    <div
+            class="progress-border"
+            style="background: conic-gradient(var(--second-color-dark) {progress}%, transparent 0%);"
+    ></div>
+    <div class="timer-content">
+        <div class="timeButtons">
+            <button on:click={() => resetTimer(initialTime)}
+                    class:btn-primary={isPomodoro}
+                    class:btn-secondary={!isPomodoro}>Pomodoro
+            </button>
+            <button on:click={() => resetTimer(shortBreakTime)}
+                    class:btn-primary={isShortBreak}
+                    class:btn-secondary={!isShortBreak}>Short Break
+            </button>
+            <button on:click={() => resetTimer(longBreakTime)}
+                    class:btn-primary={isLongBreak}
+                    class:btn-secondary={!isLongBreak}>Long Break
+            </button>
+        </div>
+        <h1>{formattedTime}</h1>
+        <div class="startButtons">
+            <button class="start btn-secondary" on:click={startTimer}>
+                {isRunning && !pause ? 'Pause' : 'Start'}
+            </button>
+            <button class="reset btn-secondary" on:click={() => resetTimer(currentInitialTime)}>Reset</button>
+            <button class="options btn-secondary" on:click={toggleOptions}>Options</button>
+        </div>
     </div>
 </div>
 
+<OptionsMenu
+        bind:visible={showOptions}
+        {initialTime}
+        {shortBreakTime}
+        {longBreakTime}
+        {runningAtStart}
+        on:updateSettings={handleUpdateSettings}
+/>
+
 <style>
+
     .timer {
         display: flex;
         flex-direction: column;
@@ -129,6 +206,37 @@
         border-radius: 20px;
         position: relative;
         padding: 20px;
+        overflow: hidden;
+    }
+
+    .progress-border {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transition: background 1s linear;
+    }
+
+    .timer::after {
+        content: '';
+        position: absolute;
+        background-color: var(--first-color-dark);
+        inset: 5px;
+        border-radius: 15px;
+    }
+
+    .timer-content {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .timer h1 {
@@ -139,15 +247,12 @@
         gap: 1rem;
         display: flex;
         justify-content: space-around;
-        position: absolute;
-        top: 69%;
+        width: auto;
     }
 
     .timeButtons {
         display: flex;
         justify-content: space-around;
-        position: absolute;
-        top: 20%;
         width: 75%;
         gap: 10px;
     }
@@ -189,78 +294,5 @@
 
     .start {
         width: 96px;
-    }
-
-    /* Tablet styles */
-    @media (max-width: 768px) {
-        .timer {
-            width: 80vw;
-            height: 60vh;
-        }
-
-        .timer h1 {
-            position: absolute;
-            font-size: 8rem;
-            top: 0;
-        }
-
-        .timeButtons {
-            position: static;
-            flex-direction: row;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .timeButtons button {
-            width: 120px;
-            padding: 15px 10px;
-            font-size: 16px;
-        }
-
-        .btn-primary, .btn-secondary {
-            padding: 15px 15px;
-            font-size: 18px;
-        }
-    }
-
-    /* Mobile styles */
-    @media (max-width: 480px) {
-        .timer {
-            width: 80vw;
-            height: auto;
-            min-height: 70vh;
-            padding: 0px 15px;
-        }
-
-        .timer h1 {
-            font-size: 6rem;
-        }
-
-        .timeButtons {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .timeButtons button {
-            width: 100%;
-            padding: 12px 10px;
-            font-size: 14px;
-        }
-
-        .startButtons {
-            width: 100%;
-            margin: 15px 0;
-        }
-
-        .start, .reset {
-            width: 45%;
-            padding: 12px;
-            font-size: 16px;
-        }
-
-        .btn-primary, .btn-secondary {
-            padding: 12px;
-            font-size: 16px;
-        }
     }
 </style>
