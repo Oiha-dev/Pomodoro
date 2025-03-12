@@ -16,6 +16,11 @@
         align-items: flex-start;
         background-color: var(--color-bg-dark);
         color: var(--font-color-dark);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
     }
 
     #flex-div {
@@ -27,7 +32,7 @@
     }
 
     footer p {
-        margin-bottom: 10px;
+        margin: 10px 0;
         padding: 0 1rem;
     }
 </style>

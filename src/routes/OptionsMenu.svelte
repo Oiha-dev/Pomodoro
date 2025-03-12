@@ -137,14 +137,14 @@
         font-size: 14px;
     }
 
-    input {
+    input[type="number"] {
         padding: 10px 20px;
         border-radius: 19px;
         font-size: 16px;
         border: none;
         background-color: var(--third-color-dark);
         border-bottom: 4px solid var(--bg-color-dark);
-        color: white;
+        color: var(--first-color-dark);
         width: 100%;
         box-sizing: border-box;
     }
@@ -155,16 +155,32 @@
         gap: 10px;
     }
 
-    .input-checkbox {
-        width: auto;
-        margin-left: 10px;
+    input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 24px;
+        height: 24px;
+        border: 2px solid var(--font-color-dark);
+        background-color: transparent;
+        cursor: pointer;
+        margin-right: 10px;
+        position: relative;
+        border-radius: 4px;
+    }
+
+    input[type="checkbox"]:checked {
+        background-color: var(--third-color-dark);
+        background-image: url("/icons/CheckMark.svg");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 14px 14px;
     }
 
     button {
         margin-top: 20px;
         padding: 10px 20px;
         background-color: var(--third-color-dark);
-        color: var(--font-color-dark);
+        color: var(--first-color-dark);
         border: none;
         border-radius: 5px;
         cursor: pointer;
@@ -173,12 +189,5 @@
 
     button:hover {
         background-color: #7ec5af;
-    }
-
-    @media (max-width: 480px) {
-        .options-content {
-            width: 90%;
-            padding: 15px;
-        }
     }
 </style>

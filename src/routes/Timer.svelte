@@ -192,14 +192,15 @@
 />
 
 <style>
-
     .timer {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        width: 50vw;
-        height: 55vh;
+        width: 90vw;
+        max-width: 600px;
+        height: auto;
+        min-height: 400px;
         margin: auto;
         background-color: var(--first-color-dark);
         color: white;
@@ -237,34 +238,42 @@
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
+        padding: 1rem 0;
     }
 
     .timer h1 {
-        font-size: 7rem;
+        font-size: clamp(6rem, 30vw, 10rem);
+        margin: 1rem 0;
+        padding: 0 0.5rem;
     }
 
     .startButtons {
-        gap: 1rem;
+        gap: 0.5rem;
         display: flex;
-        justify-content: space-around;
-        width: auto;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+        margin-top: 1rem;
     }
 
     .timeButtons {
         display: flex;
-        justify-content: space-around;
-        width: 75%;
+        justify-content: center;
+        width: 100%;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     .timeButtons button {
-        width: 156px;
+        flex: 1;
+        min-width: 100px;
+        max-width: 156px;
     }
 
     .btn-primary, .btn-secondary {
-        padding: 20px 20px;
+        padding: 15px;
         border-radius: 19px;
-        font-size: 20px;
+        font-size: clamp(14px, 4vw, 20px);
         cursor: pointer;
         text-align: center;
         border: none;
@@ -293,6 +302,29 @@
     }
 
     .start {
-        width: 96px;
+        min-width: 96px;
+    }
+
+    @media (max-width: 768px) {
+        .timer {
+            width: 75vw;
+            min-height: 350px;
+        }
+
+        .timeButtons {
+            align-items: center;
+        }
+
+        .timeButtons button {
+            width: 100%;
+            max-width: 156px;
+            min-width: 135px;
+            white-space: nowrap;
+        }
+
+        .startButtons button {
+            max-width: 100px;
+            min-width: 10px;
+        }
     }
 </style>
