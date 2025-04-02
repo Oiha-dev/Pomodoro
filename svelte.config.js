@@ -8,10 +8,9 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		paths: {
-			base: '/Pomodoro'
+			base: ''
 		}
 	}
 };
 
 export default config;
-
