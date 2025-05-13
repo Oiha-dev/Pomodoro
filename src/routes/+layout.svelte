@@ -1,9 +1,9 @@
 <script>
-    import Header from './Header.svelte';
     import Footer from './Footer.svelte';
     import Canvas from './canvas.svelte';
     import './style.css';
     import { onNavigate } from "$app/navigation";
+    import Timer from "./Timer.svelte";
 
     onNavigate(() => {
         if (!document.startViewTransition) return;
@@ -17,14 +17,11 @@
 
 
 <div class="app">
-    <Header />
-
     <main>
-        <Canvas />
-        <slot />
+        <Canvas/>
+        <slot/>
+        <Footer/>
     </main>
-
-    <Footer />
 </div>
 
 
@@ -43,7 +40,6 @@
         right: 0;
         bottom: 0;
         left: 0;
-        background-image: url("../lib/img/noise.svg");
         background-size: 64px 64px;
         background-repeat: repeat;
         opacity: 0.31;
